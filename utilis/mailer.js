@@ -5,7 +5,7 @@ const adminEmail = process.env.ADMIN_EMAIL;
 const emailUser = process.env.USER_EMAIL;
 const emailPass = process.env.USER_PASS;
 
-// Reusable transporter
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -14,11 +14,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Helper to get login URL based on userType
+
 const getLoginUrl = (userType) => {
   return userType === 'corper'
-    ? 'https://ibnw.party/corper-login'
-    : 'https://ibnw.party/login'; // non-corper login URL
+    ? 'https://ibnw-pop-party-ticket.onrender.com/event/corper-login'
+    : 'https://ibnw-pop-party-ticket.onrender.com/event/non-corper-login'; 
 };
 
 // Welcome email
