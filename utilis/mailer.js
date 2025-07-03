@@ -17,9 +17,9 @@ const transporter = nodemailer.createTransport({
 const getLoginUrl = (userType) => {
   const normalizedType = (userType || '').toLowerCase();
   if (normalizedType === 'corper') {
-    return 'https://ibnw-pop-party-ticket-fr.onrender.com/event/corper-login';
+    return 'https://ibnw-pop-party-ticket-fr.onrender.com/corper-login';
   }
-  return 'https://ibnw-pop-party-ticket-fr.onrender.com/event/non-corper-login';
+  return 'https://ibnw-pop-party-ticket-fr.onrender.com/non-corper-login';
 };
 
 // Welcome email
