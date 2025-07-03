@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { sendWelcomeEmail, sendUnapprovedLoginAlert, sendTicketEmail } = require('../utilis/mailer');
 const { uploadFilesToCloudinary } = require('../utilis/cloudinary');
@@ -122,7 +123,11 @@ const nonCorperSignup = async (req, res) => {
 const corperLogin = async (req, res) => {
   try {
     console.log('[LOGIN ATTEMPT]', req.body.email);
-    
+
+    if (!process.env.SECRETKEY) {
+      throw new Error('SECRETKEY environment variable is not defined');
+    }
+
     const { email, password } = req.body;
 
     const user = await Corper.findOne({ email }).select('+password');
@@ -142,8 +147,12 @@ const corperLogin = async (req, res) => {
     }
 
     if (user.status !== 'approved') {
-      await sendUnapprovedLoginAlert(user.firstName, user.email);
-      console.log('[UNAPPROVED LOGIN ALERT SENT]');
+      try {
+        await sendUnapprovedLoginAlert(user.firstName, user.email);
+        console.log('[UNAPPROVED LOGIN ALERT SENT]');
+      } catch (alertErr) {
+        console.error('[UNAPPROVED LOGIN ALERT ERROR]', alertErr);
+      }
     }
 
     console.log('[GENERATING TOKEN]');
@@ -152,7 +161,6 @@ const corperLogin = async (req, res) => {
       process.env.SECRETKEY,
       { expiresIn: '1h' }
     );
-
     console.log('[TOKEN GENERATED]', token);
 
     res.status(200).json({
@@ -168,7 +176,8 @@ const corperLogin = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error('[CORPER LOGIN ERROR]', err);
+    console.error('[CORPER LOGIN ERROR]', err.message);
+    console.error(err.stack);
     res.status(500).json({ error: 'Login failed', details: err.message });
   }
 };
