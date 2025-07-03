@@ -145,7 +145,7 @@ const corperLogin = async (req, res) => {
     const token = jwt.sign(
       { id: user._id, role: 'corper' },
       process.env.SECRETKEY, 
-      { expiresIn: '7h' }
+      { expiresIn: '1h' }
     );
 
     console.log('[DEBUG] Token Generated:', token);
@@ -189,7 +189,7 @@ const nonCorperLogin = async (req, res) => {
     const token = jwt.sign(
       { id: user._id, role: 'noncorper' },
       process.env.SECRETKEY,
-      { expiresIn: '7h' }
+      { expiresIn: '1h' }
     );
 
     console.log('[DEBUG] Token Generated:', token);
