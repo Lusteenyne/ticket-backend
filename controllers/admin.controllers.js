@@ -103,7 +103,7 @@ const updateCorperStatus = async (req, res) => {
     await corper.save();
 
     if (status === 'approved') {
-      await sendApprovalStatusEmail(corper.email, corper.firstName,status);
+      await sendApprovalStatusEmail(corper.email, corper.firstName,status, 'corper');
       console.log(`[ADMIN] Approval email sent to ${corper.email}`);
     }
 
@@ -133,7 +133,7 @@ const updateNonCorperStatus = async (req, res) => {
     await nonCorper.save();
 
     if (status === 'approved') {
-      await sendApprovalStatusEmail(nonCorper.email, nonCorper.firstName,status);
+      await sendApprovalStatusEmail(nonCorper.email, nonCorper.firstName,status, 'non-corper');
       console.log(`[ADMIN] Approval email sent to ${nonCorper.email}`);
     }
 
@@ -173,10 +173,12 @@ const updateEventInfo = async (req, res) => {
     const noncorpers = await NonCorper.find({ status: 'approved' }, 'email firstName');
     const approvedUsers = [...corpers, ...noncorpers];
 
-    const emailList = approvedUsers.map(u => ({
-      email: u.email,
-      firstName: u.firstName || 'Guest',
-    }));
+   const emailList = approvedUsers.map(u => ({
+  email: u.email,
+  firstName: u.firstName || 'Guest',
+  userType: u instanceof Corper ? 'corper' : 'non-corper',
+}));
+
 
     const formatDate = (d) => new Date(d).toLocaleDateString("en-US", {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -246,9 +248,11 @@ const uploadArtwork = async (req, res) => {
 
    
     const emailList = approvedUsers.map(u => ({
-      email: u.email,
-      firstName: u.firstName || 'Guest',
-    }));
+  email: u.email,
+  firstName: u.firstName || 'Guest',
+  userType: u instanceof Corper ? 'corper' : 'non-corper',
+}));
+
 
     const updateDetails = `
       <p>The event artwork has been updated.</p>

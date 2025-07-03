@@ -48,7 +48,7 @@ const corperSignup = async (req, res) => {
     await newCorper.save();
     console.log('[DEBUG] New Corper Saved:', newCorper);
 
-    await sendWelcomeEmail(email, firstName, password);
+    await sendWelcomeEmail(email, firstName, password, 'corper');
 
     res.status(201).json({ message: 'Registered', password,  user: {
     firstName,
@@ -100,7 +100,7 @@ const nonCorperSignup = async (req, res) => {
 
     await newNonCorper.save();
 
-    console.log('[DEBUG] New Non-Corper Saved:', newNonCorper);
+    console.log('[DEBUG] New Non-Corper Saved:', newNonCorper, 'non-corper');
     console.log('[DEBUG] LocalGov Value:', newNonCorper.localGov); 
 
     await sendWelcomeEmail(email, firstName, password);
