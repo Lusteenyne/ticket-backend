@@ -5,7 +5,6 @@ const adminEmail = process.env.ADMIN_EMAIL;
 const emailUser = process.env.USER_EMAIL;
 const emailPass = process.env.USER_PASS;
 
-
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -14,16 +13,27 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
+// Normalize userType to lowercase and default to 'non-corper' if missing or invalid
 const getLoginUrl = (userType) => {
-  return userType === 'corper'
-    ? 'https://ibnw-pop-party-ticket-fr.onrender.com/event/corper-login'
-    : 'https://ibnw-pop-party-ticket-fr.onrender.com/event/non-corper-login'; 
+  const normalizedType = (userType || '').toLowerCase();
+  if (normalizedType === 'corper') {
+    return 'https://ibnw-pop-party-ticket-fr.onrender.com/event/corper-login';
+  }
+  return 'https://ibnw-pop-party-ticket-fr.onrender.com/event/non-corper-login';
 };
 
 // Welcome email
 const sendWelcomeEmail = async (email, firstName, password, userType) => {
-  const loginUrl = getLoginUrl(userType);
+  const normalizedUserType = (userType || '').toLowerCase();
+  const loginUrl = getLoginUrl(normalizedUserType);
+
+  // Debug logs
+  console.log('sendWelcomeEmail called with:');
+  console.log('  Email:', email);
+  console.log('  First Name:', firstName);
+  console.log('  Password:', password);
+  console.log('  User Type:', normalizedUserType);
+  console.log('  Login URL:', loginUrl);
 
   const html = `
     <html>
@@ -45,7 +55,6 @@ const sendWelcomeEmail = async (email, firstName, password, userType) => {
       </head>
       <body>
         <div class="container">
-         
           <div class="header">
             <h1>Welcome to IBNW</h1>
             <p>Batch B Stream 2 — Pool Party Access</p>
@@ -75,6 +84,7 @@ const sendWelcomeEmail = async (email, firstName, password, userType) => {
   });
 };
 
+ 
 // Unapproved login attempt (no login link needed)
 const sendUnapprovedLoginAlert = async (firstName, email) => {
   const html = `

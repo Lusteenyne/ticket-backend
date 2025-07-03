@@ -101,10 +101,10 @@ const nonCorperSignup = async (req, res) => {
 
     await newNonCorper.save();
 
-    console.log('[DEBUG] New Non-Corper Saved:', newNonCorper, 'non-corper');
+    console.log('[DEBUG] New Non-Corper Saved:', newNonCorper);
     console.log('[DEBUG] LocalGov Value:', newNonCorper.localGov); 
 
-    await sendWelcomeEmail(email, firstName, password);
+    await sendWelcomeEmail(email, firstName, password, 'noncorper');
 
     res.status(201).json({ message: 'Registered', password, user: {
     firstName,
