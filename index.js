@@ -13,9 +13,19 @@ const adminrouter = require('./routes/admin.route');
 const allowedOrigins = [
   'https://ibnw-pop-party-ticket-fr.onrender.com',
 ];
-app.use(cors({   origin: allowedOrigins,
-  credentials: true,}));
-app.use(express.json({limit: '50mb'}));
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
+app.options('*', cors()); // <- IMPORTANT for preflight
 
 //routes
 app.use("/event", eventrouter);
