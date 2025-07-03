@@ -12,6 +12,7 @@ const adminrouter = require('./routes/admin.route');
 // Allow only this origin for CORS
 app.use(cors({ origin: 'https://ibnw-pop-party-ticket-fr.onrender.com' }));
 
+app.use(express.json());
 // Routes
 console.log('Mounting event router at /event');
 app.use("/event", eventrouter);
