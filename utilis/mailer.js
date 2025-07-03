@@ -190,7 +190,7 @@ const sendEventUpdateNotification = async (emailList, updateDetails) => {
         <body style="font-family: 'Segoe UI', sans-serif; background-color: #f9fafb; padding: 30px; margin: 0;">
           <div style="max-width: 600px; background: #fff; border-radius: 10px; padding: 30px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
             <h2 style="color: #d97706; margin-top: 0; font-weight: 700;">IBNW Event Update</h2>
-            <p>Dear ${firstName},</p>
+            <p>Hi, Aqua Mob ${firstName},</p>
             <p>The IBNW pool party event details have been updated. Please see the changes below:</p>
             ${updateDetails}
             <p>Click below to log in and view more:</p>
@@ -236,7 +236,7 @@ const sendArtworkUpdateNotification = async (emailList, updateDetails) => {
         <body style="font-family: 'Segoe UI', sans-serif; background-color: #f9fafb; padding: 30px; margin: 0;">
           <div style="max-width: 600px; background: #fff; border-radius: 10px; padding: 30px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
             <h2 style="color: #2563eb; margin-top: 0; font-weight: 700;">IBNW Event Artwork Updated</h2>
-            <p>Dear ${firstName},</p>
+            <p>Hi, Aqua Mob ${firstName},</p>
             <p>The event artwork has been updated. Please click the link below to view the new artwork:</p>
             ${updateDetails}
             <p>Click below to log in and view more:</p>
@@ -273,138 +273,45 @@ const sendArtworkUpdateNotification = async (emailList, updateDetails) => {
 };
 // Ticket email
 const sendTicketEmail = async (user) => {
-  const formattedDate = user.date
-    ? new Date(user.date).toLocaleDateString('en-NG', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : 'To Be Announced';
+ const formattedDate = user.date
+  ? new Date(user.date).toLocaleDateString('en-NG', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    })
+  : 'To Be Announced';
 
-  const html = `
-    <html>
-      <head>
-        <style>
-          body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f8;
-            color: #333;
-          }
-          .container {
-            max-width: 600px;
-            margin: 30px auto;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-          }
-          .header {
-            background: linear-gradient(135deg, #9c27b0, #ff4081);
-            color: white;
-            text-align: center;
-            padding: 30px 20px;
-            font-weight: 700;
-            font-size: 24px;
-          }
-          .content {
-            padding: 25px 30px;
-            font-size: 16px;
-            line-height: 1.5;
-            color: #222;
-            text-align: center;
-          }
-          .ticket-box {
-            margin-top: 20px;
-            background: #fafafa;
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.15);
-            display: flex;
-            flex-wrap: wrap;
-            padding: 25px;
-            color: #222;
-          }
-          .ticket-left, .ticket-right {
-            flex: 1;
-            min-width: 160px;
-          }
-          .ticket-left {
-            border-right: 2px dashed #ccc;
-            padding-right: 20px;
-            text-align: center;
-          }
-          .ticket-left .stripe {
-            width: 80%;
-            height: 40px;
-            margin: 15px auto;
-            background: repeating-linear-gradient(to right, #333, #333 2px, #fff 2px, #fff 4px);
-          }
-          .ticket-left p {
-            margin: 6px 0;
-            font-weight: 600;
-            color: #555;
-          }
-          .ticket-left strong {
-            font-size: 18px;
-            color: #9c27b0;
-          }
-          .ticket-right {
-            padding-left: 25px;
-            text-align: left;
-          }
-          .ticket-right h2 {
-            color: #9c27b0;
-            margin: 0 0 10px;
-            font-weight: 700;
-          }
-          .ticket-right p {
-            margin: 6px 0;
-            color: #555;
-          }
-          .highlight {
-            color: #a000ff;
-            font-weight: 600;
-          }
-          .footer {
-            margin: 30px 0 20px;
-            font-size: 14px;
-            color: #888;
-            font-style: italic;
-            text-align: center;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container" role="main" aria-label="POP PARTY 2025 Ticket">
-          <div class="header">POP PARTY 2025 TICKET</div>
-          <div class="content">
-            <p>You're officially in, Aqua Mob <strong>${user.firstName}</strong>. Show this ticket at the entrance to get access to the wildest poolside celebration of the year.</p>
-            <div class="ticket-box" role="region" aria-label="Ticket details">
-              <div class="ticket-left">
-                <div class="stripe" aria-hidden="true"></div>
-                <p>ADMIT ONE</p>
-                <p>Ticket No.<br /><strong>${user.ticketId || 'TBD'}</strong></p>
-              </div>
-              <div class="ticket-right">
-                <h2>POP PARTY 2025</h2>
-                <p>No. <span class="highlight">${user.ticketId || 'TBD'}</span></p>
-                <p>Name: <span class="highlight">Aqua Mob ${user.lastName} ${user.firstName}</span></p>
-                <p>Date: <span class="highlight">${formattedDate}</span></p>
-                <p>LGA: <span class="highlight">${user.localGov}</span></p>
-                <p style="margin-top: 15px; font-style: italic; color: #9c27b0;">Congratulations</p>
-              </div>
-            </div>
-            <p style="margin-top: 25px;">See you by the poolside soon!</p>
-          </div>
-          <div class="footer">
-            Powered by <strong>BadMan</strong>
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
+const html = `
+  <div style="font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #9c27b0, #ff4081); padding: 30px 20px; border-radius: 16px; color: white; text-align: center;">
+    <h2 style="margin-top: 0;">POP PARTY 2025 TICKET</h2>
 
-  return transporter.sendMail({
+    <p style="margin-bottom: 15px; font-size: 1rem;">You're officially in, Aqua Mob ${user.firstName}.. Show this ticket at the entrance to get access to the wildest poolside celebration of the year.</p>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; background: white; color: #222; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); font-weight: 600; margin-top: 10px;">
+      <div style="flex: 1; padding-right: 15px; border-right: 2px dashed #ccc; text-align: center; min-width: 150px;">
+        <div style="width: 80%; height: 40px; margin: 10px auto; background: repeating-linear-gradient(to right, #333, #333 2px, #fff 2px, #fff 4px);"></div>
+        <p style="margin: 8px 0;">ADMIT ONE</p>
+        <p style="margin: 0;">Ticket No.<br /><strong>${user.ticketId || 'TBD'}</strong></p>
+      </div>
+      <div style="flex: 2; padding-left: 25px; min-width: 220px;">
+        <h2 style="color: #6e00ff; margin: 0 0 10px;">POP PARTY 2025</h2>
+        <p style="color: #777; font-size: 0.9rem; margin: 0 0 10px;">No. ${user.ticketId || 'TBD'}</p>
+        <p style="margin: 8px 0;">Name: <span style="color: #a000ff;">Aqua Mob ${user.lastName} ${user.firstName}</span></p>
+        <p style="margin: 8px 0;">Date: <span style="color: #a000ff;">${formattedDate}</span></p>
+           <p style="margin: 8px 0;">LGA: <span style="color: #a000ff;">${user.localGov}</span></p>
+
+        <p style="margin-top: 15px; font-style: italic; color: #6e00ff;">Congratulations</p>
+      </div>
+    </div>
+
+    <p style="margin-top: 20px; font-size: 1rem;">See you by the poolside soon!</p>
+
+    <div style="margin-top: 30px; font-size: 0.85rem; color: #ddd;">
+      Powered by <strong style="color: #fff;">BadMan</strong>
+    </div>
+  </div>
+`;
+
+
+  return await transporter.sendMail({
     from: `"POP PARTY 2025" <${emailUser}>`,
     to: user.email,
     subject: 'Your POP PARTY 2025 Ticket',
