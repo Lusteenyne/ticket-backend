@@ -10,8 +10,11 @@ const eventrouter = require('./routes/event.route');
 const adminrouter = require('./routes/admin.route');
 
 
-
-app.use(cors({   origin: '*',}));
+const allowedOrigins = [
+  'https://ibnw-pop-party-ticket-fr.onrender.com',
+];
+app.use(cors({   origin: allowedOrigins,
+  credentials: true,}));
 app.use(express.json({limit: '50mb'}));
 
 //routes
