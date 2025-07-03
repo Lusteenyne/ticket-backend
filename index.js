@@ -19,7 +19,7 @@ app.use("/event", eventrouter);
 console.log('Mounting admin router at /admin');
 app.use("/admin", adminrouter);
 
-// Connect to database
+// Connect to database 
 connect()
   .then(() => console.log('Database connected successfully'))
   .catch(err => {
