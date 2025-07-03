@@ -121,34 +121,39 @@ const nonCorperSignup = async (req, res) => {
 //  CORPER LOGIN 
 const corperLogin = async (req, res) => {
   try {
-    console.log('[DEBUG] Corper Login Attempt:', req.body);
-
+    console.log('[LOGIN ATTEMPT]', req.body.email);
+    
     const { email, password } = req.body;
 
     const user = await Corper.findOne({ email }).select('+password');
     if (!user) {
-      console.log('[DEBUG] Corper not found:', email);
+      console.log('[LOGIN FAILED] User not found:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    console.log('[USER FOUND]', user);
+
     const match = await bcrypt.compare(password, user.password);
+    console.log('[PASSWORD MATCH]', match);
+
     if (!match) {
-      console.log('[DEBUG] Invalid password for:', email);
+      console.log('[LOGIN FAILED] Wrong password:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     if (user.status !== 'approved') {
       await sendUnapprovedLoginAlert(user.firstName, user.email);
-      console.log('[DEBUG] Unapproved login alert sent');
+      console.log('[UNAPPROVED LOGIN ALERT SENT]');
     }
 
+    console.log('[GENERATING TOKEN]');
     const token = jwt.sign(
       { id: user._id, role: 'corper' },
-      process.env.SECRETKEY, 
+      process.env.SECRETKEY,
       { expiresIn: '1h' }
     );
 
-    console.log('[DEBUG] Token Generated:', token);
+    console.log('[TOKEN GENERATED]', token);
 
     res.status(200).json({
       message: user.status === 'approved' ? 'Login successful' : 'Login successful but pending approval',
@@ -163,7 +168,7 @@ const corperLogin = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error('[CORPER LOGIN] Error:', err);
+    console.error('[CORPER LOGIN ERROR]', err);
     res.status(500).json({ error: 'Login failed', details: err.message });
   }
 };
