@@ -10,6 +10,7 @@ const {
   updateCorperStatus,
   updateNonCorperStatus,
   updateEventInfo,
+  resetEventInfo,
   
   uploadArtwork
 } = require('../controllers/admin.controllers');
@@ -38,6 +39,9 @@ adminrouter.post(
   upload.single('artwork'),
   uploadArtwork
 );
+
+//resteventinfo
+adminrouter.patch('/reset-event-info', authenticateToken, resetEventInfo);
 
 
 

@@ -133,7 +133,7 @@ const corperLogin = async (req, res) => {
     const user = await Corper.findOne({ email }).select('+password');
     if (!user) {
       console.log('[LOGIN FAILED] User not found:', email);
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Email not found' });
     }
 
     console.log('[USER FOUND]', user);
@@ -143,7 +143,7 @@ const corperLogin = async (req, res) => {
 
     if (!match) {
       console.log('[LOGIN FAILED] Wrong password:', email);
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Incorrect Password' });
     }
 
     if (user.status !== 'approved') {
@@ -190,9 +190,15 @@ const nonCorperLogin = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await NonCorper.findOne({ email }).select('+password');
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      console.log('[DEBUG] Invalid credentials for:', email);
-      return res.status(401).json({ error: 'Invalid credentials' });
+    if (!user) {
+      console.log('[DEBUG] Non-Corper Email not found:', email);
+      return res.status(401).json({ error: 'Email not found' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      console.log('[DEBUG] Non-Corper Incorrect password for:', email);
+      return res.status(401).json({ error: 'Incorrect Password' });
     }
 
     if (user.status !== 'approved') {
@@ -209,7 +215,10 @@ const nonCorperLogin = async (req, res) => {
     console.log('[DEBUG] Token Generated:', token);
 
     res.status(200).json({
-      message: user.status === 'approved' ? 'Login successful' : 'Login successful but pending approval',
+      message:
+        user.status === 'approved'
+          ? 'Login successful'
+          : 'Login successful but pending approval',
       token,
       user: {
         id: user._id,

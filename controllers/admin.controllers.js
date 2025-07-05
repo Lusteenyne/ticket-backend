@@ -151,48 +151,78 @@ const updateEventInfo = async (req, res) => {
   try {
     const { date, venue, time, ticketNote } = req.body;
 
+    console.log('[Incoming Request Body]', { date, venue, time, ticketNote });
+
     if (!date && !venue && !time && !ticketNote) {
       return res.status(400).json({ error: 'At least one field (date, venue, time, ticketNote) must be provided' });
     }
 
-    // Fetch or create event config
     let eventConfig = await EventConfig.findOne();
     if (!eventConfig) {
       eventConfig = new EventConfig({});
+      console.log('[New EventConfig] Created fresh config');
     }
 
-    if (date) eventConfig.date = date;
-    if (venue) eventConfig.venue = venue;
-    if (time) eventConfig.time = time;
-    if (ticketNote) eventConfig.ticketNote = ticketNote;
+    if (date) {
+      eventConfig.date = date;
+      console.log('[EventConfig] Updated date to:', date);
+    }
+    if (venue) {
+      eventConfig.venue = venue;
+      console.log('[EventConfig] Updated venue to:', venue);
+    }
+    if (time) {
+      eventConfig.time = time;
+      console.log('[EventConfig] Updated time to:', time);
+    }
+    if (ticketNote) {
+      eventConfig.ticketNote = ticketNote;
+      console.log('[EventConfig] Updated ticketNote to:', ticketNote);
+    }
+
     eventConfig.updatedAt = new Date();
 
     await eventConfig.save();
+    console.log('[EventConfig] Saved successfully:', eventConfig);
 
-    // Fetch approved users from both models
+    // Fetch approved users
     const corpers = await Corper.find({ status: 'approved' }, 'email firstName');
     const noncorpers = await NonCorper.find({ status: 'approved' }, 'email firstName');
     const approvedUsers = [...corpers, ...noncorpers];
 
-   const emailList = approvedUsers.map(u => ({
-  email: u.email,
-  firstName: u.firstName || 'Guest',
-  userType: u instanceof Corper ? 'corper' : 'non-corper',
-}));
+    console.log(`[Notify] Found ${approvedUsers.length} approved users`);
 
+    const emailList = approvedUsers.map(u => ({
+      email: u.email,
+      firstName: u.firstName || 'Guest',
+      userType: u instanceof Corper ? 'corper' : 'non-corper',
+    }));
 
-    const formatDate = (d) => new Date(d).toLocaleDateString("en-US", {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
+    const formatDate = (d) => {
+      const parsed = new Date(d);
+      return isNaN(parsed)
+        ? 'To be announced'
+        : parsed.toLocaleDateString("en-US", {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          });
+    };
+
+    const formattedDate = formatDate(date);
 
     const updateDetails = `
-      ${date ? `<p><strong>Date:</strong> ${formatDate(date)}</p>` : ''}
-      ${venue ? `<p><strong>Venue:</strong> ${venue}</p>` : ''}
-      ${time ? `<p><strong>Time:</strong> ${time}</p>` : ''}
-      ${ticketNote ? `<p><strong>Note:</strong> ${ticketNote}</p>` : ''}
+      <p><strong>Date:</strong> ${date ? formattedDate : 'To be announced'}</p>
+      <p><strong>Venue:</strong> ${venue || 'To be announced soon'}</p>
+      <p><strong>Time:</strong> ${time || 'TBA'}</p>
+      <p><strong>Note:</strong> ${ticketNote || 'Details coming soon'}</p>
     `;
 
+    console.log('[Email Content Preview]', updateDetails);
+
     await sendEventUpdateNotification(emailList, updateDetails);
+    console.log('[Notification] Emails sent');
 
     return res.status(200).json({
       message: 'Global event info updated and approved users notified',
@@ -200,10 +230,39 @@ const updateEventInfo = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('[ERROR] updateGlobalEventInfo failed:', err);
+    console.error('[ERROR] updateEventInfo failed:', err);
     return res.status(500).json({ error: 'Failed to update event info' });
   }
 };
+
+const resetEventInfo = async (req, res) => {
+  try {
+    // Fetch or create the event config
+    let eventConfig = await EventConfig.findOne();
+    if (!eventConfig) {
+      eventConfig = new EventConfig({});
+    }
+
+    // Reset fields to default values
+    eventConfig.date = "To be announced soon";
+    eventConfig.venue = "To be announced soon";
+    eventConfig.time = "To be announced soon";
+    eventConfig.ticketNote = "To be announced soon";
+    eventConfig.updatedAt = new Date();
+
+    await eventConfig.save();
+
+    return res.status(200).json({
+      message: 'Event info reset to default (no notifications sent)',
+      reset: eventConfig,
+    });
+
+  } catch (err) {
+    console.error('[ERROR] resetEventInfo failed:', err);
+    return res.status(500).json({ error: 'Failed to reset event info' });
+  }
+};
+
 
 
 const uploadArtwork = async (req, res) => {
@@ -285,4 +344,5 @@ module.exports = {
   updateEventInfo,
   // uploadUserImage,
   uploadArtwork ,
+  resetEventInfo,
 };
