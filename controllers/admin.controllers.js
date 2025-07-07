@@ -234,12 +234,16 @@ const updateEventInfo = async (req, res) => {
     return res.status(500).json({ error: 'Failed to update event info' });
   }
 };
-
 const resetEventInfo = async (req, res) => {
   try {
+    console.log(' resetEventInfo started');
+
     // Fetch or create the event config
     let eventConfig = await EventConfig.findOne();
+    console.log('🔍 Fetched eventConfig:', eventConfig);
+
     if (!eventConfig) {
+      console.log(' No existing eventConfig found. Creating new one.');
       eventConfig = new EventConfig({});
     }
 
@@ -250,7 +254,10 @@ const resetEventInfo = async (req, res) => {
     eventConfig.ticketNote = "To be announced soon";
     eventConfig.updatedAt = new Date();
 
+    console.log('Resetting eventConfig to:', eventConfig);
+
     await eventConfig.save();
+    console.log('eventConfig saved successfully');
 
     return res.status(200).json({
       message: 'Event info reset to default (no notifications sent)',
