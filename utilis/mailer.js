@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-
+const EventConfig = require('../model/eventArtwork.model');
 // Load environment variables
 const adminEmail = process.env.ADMIN_EMAIL;
 const emailUser = process.env.USER_EMAIL;
