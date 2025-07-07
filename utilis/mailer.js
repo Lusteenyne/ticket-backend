@@ -273,43 +273,51 @@ const sendArtworkUpdateNotification = async (emailList, updateDetails) => {
 };
 // Ticket email
 const sendTicketEmail = async (user) => {
- const formattedDate = user.date
-  ? new Date(user.date).toLocaleDateString('en-NG', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    })
-  : 'To Be Announced';
+  // Fetch latest event info from EventConfig
+  const event = await EventConfig.findOne().sort({ updatedAt: -1 });
 
-const html = `
-  <div style="font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #9c27b0, #ff4081); padding: 30px 20px; border-radius: 16px; color: white; text-align: center;">
-    <h2 style="margin-top: 0;">POP PARTY 2025 TICKET</h2>
+  const formattedDate = event?.date
+    ? new Date(event.date).toLocaleDateString('en-NG', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    : 'To Be Announced';
 
-    <p style="margin-bottom: 15px; font-size: 1rem;">You're officially in, Aqua Mob ${user.firstName}.. Show this ticket at the entrance to get access to the wildest poolside celebration of the year.</p>
+  const venue = event?.venue || 'To Be Announced';
 
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; background: white; color: #222; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); font-weight: 600; margin-top: 10px;">
-      <div style="flex: 1; padding-right: 15px; border-right: 2px dashed #ccc; text-align: center; min-width: 150px;">
-        <div style="width: 80%; height: 40px; margin: 10px auto; background: repeating-linear-gradient(to right, #333, #333 2px, #fff 2px, #fff 4px);"></div>
-        <p style="margin: 8px 0;">ADMIT ONE</p>
-        <p style="margin: 0;">Ticket No.<br /><strong>${user.ticketId || 'TBD'}</strong></p>
+  const html = `
+    <div style="font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #9c27b0, #ff4081); padding: 30px 20px; border-radius: 16px; color: white; text-align: center;">
+      <h2 style="margin-top: 0;">POP PARTY 2025 TICKET</h2>
+
+      <p style="margin-bottom: 15px; font-size: 1rem;">You're officially in, Aqua Mob ${user.firstName}.. Show this ticket at the entrance to get access to the wildest poolside celebration of the year.</p>
+
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; background: white; color: #222; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); font-weight: 600; margin-top: 10px;">
+        <div style="flex: 1; padding-right: 15px; border-right: 2px dashed #ccc; text-align: center; min-width: 150px;">
+          <div style="width: 80%; height: 40px; margin: 10px auto; background: repeating-linear-gradient(to right, #333, #333 2px, #fff 2px, #fff 4px);"></div>
+          <p style="margin: 8px 0;">ADMIT ONE</p>
+          <p style="margin: 0;">Ticket No.<br /><strong>${user.ticketId || 'TBD'}</strong></p>
+        </div>
+        <div style="flex: 2; padding-left: 25px; min-width: 220px;">
+          <h2 style="color: #6e00ff; margin: 0 0 10px;">POP PARTY 2025</h2>
+          <p style="color: #777; font-size: 0.9rem; margin: 0 0 10px;">No. ${user.ticketId || 'TBD'}</p>
+          <p style="margin: 8px 0;">Name: <span style="color: #a000ff;">Aqua Mob ${user.lastName} ${user.firstName}</span></p>
+          <p style="margin: 8px 0;">Date: <span style="color: #a000ff;">${formattedDate}</span></p>
+          <p style="margin: 8px 0;">LGA: <span style="color: #a000ff;">${user.localGov}</span></p>
+
+          <p style="margin-top: 15px; font-style: italic; color: #6e00ff;">Congratulations</p>
+        </div>
       </div>
-      <div style="flex: 2; padding-left: 25px; min-width: 220px;">
-        <h2 style="color: #6e00ff; margin: 0 0 10px;">POP PARTY 2025</h2>
-        <p style="color: #777; font-size: 0.9rem; margin: 0 0 10px;">No. ${user.ticketId || 'TBD'}</p>
-        <p style="margin: 8px 0;">Name: <span style="color: #a000ff;">Aqua Mob ${user.lastName} ${user.firstName}</span></p>
-        <p style="margin: 8px 0;">Date: <span style="color: #a000ff;">${formattedDate}</span></p>
-           <p style="margin: 8px 0;">LGA: <span style="color: #a000ff;">${user.localGov}</span></p>
 
-        <p style="margin-top: 15px; font-style: italic; color: #6e00ff;">Congratulations</p>
+      <p style="margin-top: 20px; font-size: 1rem;"> <strong>Venue:</strong> ${venue}</p>
+      <p style="margin-top: 10px; font-size: 1rem;">See you by the poolside soon!</p>
+
+      <div style="margin-top: 30px; font-size: 0.85rem; color: #ddd;">
+        Powered by <strong style="color: #fff;">BadMan</strong>
       </div>
     </div>
-
-    <p style="margin-top: 20px; font-size: 1rem;">See you by the poolside soon!</p>
-
-    <div style="margin-top: 30px; font-size: 0.85rem; color: #ddd;">
-      Powered by <strong style="color: #fff;">BadMan</strong>
-    </div>
-  </div>
-`;
-
+  `;
 
   return await transporter.sendMail({
     from: `"POP PARTY 2025" <${emailUser}>`,
