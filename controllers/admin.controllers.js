@@ -154,7 +154,9 @@ const updateEventInfo = async (req, res) => {
     console.log('[Incoming Request Body]', { date, venue, time, ticketNote });
 
     if (!date && !venue && !time && !ticketNote) {
-      return res.status(400).json({ error: 'At least one field (date, venue, time, ticketNote) must be provided' });
+      return res.status(400).json({
+        error: 'At least one field (date, venue, time, ticketNote) must be provided',
+      });
     }
 
     let eventConfig = await EventConfig.findOne();
@@ -164,25 +166,32 @@ const updateEventInfo = async (req, res) => {
     }
 
     if (date) {
-      eventConfig.date = date;
-      console.log('[EventConfig] Updated date to:', date);
+      const parsedDate = new Date(date);
+      if (isNaN(parsedDate)) {
+        return res.status(400).json({ error: 'Invalid date format' });
+      }
+      eventConfig.date = parsedDate;
+      console.log('[EventConfig] Updated date to:', parsedDate);
     }
+
     if (venue) {
       eventConfig.venue = venue;
       console.log('[EventConfig] Updated venue to:', venue);
     }
+
     if (time) {
       eventConfig.time = time;
       console.log('[EventConfig] Updated time to:', time);
     }
+
     if (ticketNote) {
       eventConfig.ticketNote = ticketNote;
       console.log('[EventConfig] Updated ticketNote to:', ticketNote);
     }
 
     eventConfig.updatedAt = new Date();
-
     await eventConfig.save();
+
     console.log('[EventConfig] Saved successfully:', eventConfig);
 
     // Fetch approved users
@@ -199,24 +208,23 @@ const updateEventInfo = async (req, res) => {
     }));
 
     const formatDate = (d) => {
-      const parsed = new Date(d);
-      return isNaN(parsed)
-        ? 'To be announced'
-        : parsed.toLocaleDateString("en-US", {
+      return d
+        ? new Date(d).toLocaleDateString("en-US", {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric',
-          });
+          })
+        : 'To be announced';
     };
 
-    const formattedDate = formatDate(date);
+    const formattedDate = formatDate(eventConfig.date);
 
     const updateDetails = `
-      <p><strong>Date:</strong> ${date ? formattedDate : 'To be announced'}</p>
-      <p><strong>Venue:</strong> ${venue || 'To be announced soon'}</p>
-      <p><strong>Time:</strong> ${time || 'TBA'}</p>
-      <p><strong>Note:</strong> ${ticketNote || 'Details coming soon'}</p>
+      <p><strong>Date:</strong> ${formattedDate}</p>
+      <p><strong>Venue:</strong> ${eventConfig.venue || 'To be announced soon'}</p>
+      <p><strong>Time:</strong> ${eventConfig.time || 'TBA'}</p>
+      <p><strong>Note:</strong> ${eventConfig.ticketNote || 'Details coming soon'}</p>
     `;
 
     console.log('[Email Content Preview]', updateDetails);
@@ -234,21 +242,22 @@ const updateEventInfo = async (req, res) => {
     return res.status(500).json({ error: 'Failed to update event info' });
   }
 };
+
+
 const resetEventInfo = async (req, res) => {
   try {
-    console.log(' resetEventInfo started');
+    console.log('resetEventInfo started');
 
-    // Fetch or create the event config
     let eventConfig = await EventConfig.findOne();
     console.log('🔍 Fetched eventConfig:', eventConfig);
 
     if (!eventConfig) {
-      console.log(' No existing eventConfig found. Creating new one.');
+      console.log('No existing eventConfig found. Creating new one.');
       eventConfig = new EventConfig({});
     }
 
-    // Reset fields to default values
-    eventConfig.date = "To be announced soon";
+    // Reset fields to null or placeholder values
+    eventConfig.date = null;  
     eventConfig.venue = "To be announced soon";
     eventConfig.time = "To be announced soon";
     eventConfig.ticketNote = "To be announced soon";
