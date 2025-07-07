@@ -298,6 +298,7 @@ const sendTicketEmail = async (user) => {
           <div style="width: 80%; height: 40px; margin: 10px auto; background: repeating-linear-gradient(to right, #333, #333 2px, #fff 2px, #fff 4px);"></div>
           <p style="margin: 8px 0;">ADMIT ONE</p>
           <p style="margin: 0;">Ticket No.<br /><strong>${user.ticketId || 'TBD'}</strong></p>
+          
         </div>
         <div style="flex: 2; padding-left: 25px; min-width: 220px;">
           <h2 style="color: #6e00ff; margin: 0 0 10px;">POP PARTY 2025</h2>
@@ -310,7 +311,7 @@ const sendTicketEmail = async (user) => {
         </div>
       </div>
 
-      <p style="margin-top: 20px; font-size: 1rem;"> <strong>Venue:</strong> ${venue}</p>
+      <p style="margin-top:   10px; font-size: 1rem;"> <strong>${venue}</p>
       <p style="margin-top: 10px; font-size: 1rem;">See you by the poolside soon!</p>
 
       <div style="margin-top: 30px; font-size: 0.85rem; color: #ddd;">
